@@ -12,7 +12,7 @@
 
         <mapsui:MapControl x:Name="mojaMapa" Grid.Row="0"/>
 
-        <StackLayout Orientation="Vertical">
+        <StackLayout Orientation="Vertical" HorizontalOptions="End" VerticalOptions="Start">
             <Button Text="+" WidthRequest="50" HeightRequest="50" FontAttributes="Bold"/>
             <Button Text="-" WidthRequest="50" HeightRequest="50" FontAttributes="Bold"/>
         </StackLayout>
@@ -28,10 +28,18 @@
                    Margin="10"
                    VerticalOptions="Center"/>
 
-            <Button Grid.Column="1"
+            <HorizontalStackLayout Grid.Column="1">
+                
+            <Button 
+        Text="Szukaj"
+        x:Name="btnSzukaj"
+        Clicked="btnSzukaj_Clicked"/>
+
+            <Button
                     Text="JEDŹ"
                     x:Name="btnJedz"
                     Clicked="btnJedz_Clicked"/>
+            </HorizontalStackLayout>
             </Grid>
 
     
