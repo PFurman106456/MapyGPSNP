@@ -5,6 +5,7 @@ using Mapsui.Nts;
 using Mapsui.Projections;
 using Mapsui.Styles;
 using MapyGPSNP.Helpers;
+using MapyGPSNP.Model;
 using NetTopologySuite.Geometries;
 using Color = Mapsui.Styles.Color;
 
@@ -28,10 +29,13 @@ namespace MapyGPSNP
 
         }
 
-        private void btnJedz_Clicked(object sender, EventArgs e)
+        private async Task btnJedz_Clicked(object sender, EventArgs e)
         {
-            var punktyTrasy = TrasaManager.PobierzMocka();
+            
+        }
 
+        private void RysujTrase(List<Punkt> punktyTrasy)
+        {
             var listaKoordynatow = new List<Coordinate>();
 
             foreach (var punkt in punktyTrasy)
@@ -66,6 +70,38 @@ namespace MapyGPSNP
         private async void btnSzukaj_Clicked(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new WyznaczanieTrasyPage());
+        }
+
+        private async void btnJedz_Clicked_1(object sender, EventArgs e)
+        {
+            //var punktyTrasy = TrasaManager.PobierzMocka();
+            double startLat = 53.1235;
+            double startLon = 18.0084;
+
+            double metaLat = 54.609445;
+            double metaLon = 18.801177;
+
+            // wyśrodkowanie i zbliżenie mapy na obszarze końca trasy
+            var punktMeta = SphericalMercator.FromLonLat(metaLon, metaLat);
+            var cel = new MPoint(punktMeta.x, punktMeta.y);
+            mojaMapa.Map?.Navigator.CenterOn(cel);
+            mojaMapa.Map?.Navigator.ZoomTo(10);
+
+
+            var trasa = await TrasaManager.PobierzTrase(startLat, startLon, metaLat, metaLon);
+
+            if (trasa != null)
+            {
+                var punktyTrasy = trasa.Geometria.PunktyWspolrzednych.Select(p => new Punkt(p[0], p[1])).ToList();
+
+                RysujTrase(punktyTrasy);
+
+                double dystansKm = trasa.Dystans / 1000;
+                int czasMinuty = (int)Math.Round(trasa.CzasSekundy / 60);
+
+                lblOpisTrasy.Text += $"\tDystans: {dystansKm:F2} km, Czas: {czasMinuty} min";
+            }
+
         }
     }
 

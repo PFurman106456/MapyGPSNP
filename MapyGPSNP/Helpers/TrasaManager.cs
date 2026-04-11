@@ -1,6 +1,7 @@
 ﻿using MapyGPSNP.Model;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -10,6 +11,32 @@ namespace MapyGPSNP.Helpers
 {
     public static class TrasaManager
     {
+
+        public static async Task<DaneTrasy> PobierzTrase(double startLat, double startLon, double metaLat, double metaLon)
+        {
+            string start = $"{startLon.ToString(CultureInfo.InvariantCulture)},{startLat.ToString(CultureInfo.InvariantCulture)}";
+
+            string meta = $"{metaLon.ToString(CultureInfo.InvariantCulture)},{metaLat.ToString(CultureInfo.InvariantCulture)}";
+
+
+            string url = $"http://router.project-osrm.org/route/v1/driving/{start};{meta}?overview=full&geometries=geojson";
+
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("User-Agent", "ProjektStudencki");
+
+            var json = await client.GetStringAsync(url);
+
+            var odp = JsonSerializer.Deserialize<OdpowiedzOSRM>(json);
+
+            if(odp != null && odp.ListaTras.Count > 0)
+            {
+                return odp.ListaTras[0];
+            }
+
+
+            return null;
+        }
+
 
         public static List<Punkt> PobierzMocka()
         {

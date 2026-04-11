@@ -38,7 +38,7 @@
             <Button
                     Text="JEDŹ"
                     x:Name="btnJedz"
-                    Clicked="btnJedz_Clicked"/>
+                    Clicked="btnJedz_Clicked_1"/>
             </HorizontalStackLayout>
             </Grid>
 
