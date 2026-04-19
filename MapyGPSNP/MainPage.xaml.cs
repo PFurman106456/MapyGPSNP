@@ -36,46 +36,38 @@ namespace MapyGPSNP
             
         }
 
-        private void WyczyscTrase()
+        private void WyczyscWarstwe(string nazwa)
         {
-            var stara = mojaMapa.Map?.Layers.FirstOrDefault(l => l.Name == "warstwaTrasy");
-            if (stara != null)
-                mojaMapa.Map?.Layers.Remove(stara);
+            var warstwa = mojaMapa.Map?.Layers.FirstOrDefault(l => l.Name == nazwa);
+            if (warstwa != null)
+                mojaMapa.Map?.Layers.Remove(warstwa);
         }
 
-        private void RysujTrase(List<Punkt> punktyTrasy)
+        private List<MPoint> RysujTrase(List<Punkt> punktyTrasy)
         {
-            WyczyscTrase();
+            WyczyscWarstwe("warstwaTrasy");
+            WyczyscWarstwe("warstwaMarkerow");
 
-            var listaKoordynatow = new List<Coordinate>();
+            var projekcje = punktyTrasy
+                .Select(p => { var k = SphericalMercator.FromLonLat(p.Dlugosc, p.Szerokosc); return new MPoint(k.x, k.y); })
+                .ToList();
 
-            foreach (var punkt in punktyTrasy)
-            {
-                var wynikKonwersji = SphericalMercator.FromLonLat(punkt.Dlugosc, punkt.Szerokosc);
+            var linia = new GeometryFeature(new LineString(projekcje.Select(p => new Coordinate(p.X, p.Y)).ToArray()));
+            linia.Styles.Add(new VectorStyle { Line = new Pen(Color.Blue, 7) });
+            mojaMapa.Map?.Layers.Add(new MemoryLayer { Features = [linia], Name = "warstwaTrasy" });
 
-                listaKoordynatow.Add(new Coordinate(wynikKonwersji.x, wynikKonwersji.y));
-            }
+            var markerStart = new PointFeature(projekcje.First());
+            markerStart.Styles.Add(new SymbolStyle { Fill = new Mapsui.Styles.Brush(Color.Green), Outline = new Pen(Color.White, 2), SymbolScale = 0.6 });
 
-            var sciezkaKsztalt = new LineString(listaKoordynatow.ToArray());
+            var markerKoniec = new PointFeature(projekcje.Last());
+            markerKoniec.Styles.Add(new SymbolStyle { Fill = new Mapsui.Styles.Brush(Color.Red), Outline = new Pen(Color.White, 2), SymbolScale = 0.6 });
 
-            var sciezkaNaMapie = new GeometryFeature(sciezkaKsztalt);
+            mojaMapa.Map?.Layers.Add(new MemoryLayer { Features = [markerStart, markerKoniec], Name = "warstwaMarkerow" });
 
-            sciezkaNaMapie.Styles.Add(new VectorStyle
-            {
-                Line = new Pen(Color.Blue, 7)
-            });
-
-            var warstwaTrasy = new MemoryLayer()
-            {
-                Features = [sciezkaNaMapie],
-                Name = "warstwaTrasy"
-            };
-
-            mojaMapa.Map?.Layers.Add(warstwaTrasy);
             mojaMapa.Refresh();
-
-
             lblOpisTrasy.Text = "Trasa została narysowana!";
+
+            return projekcje;
         }
 
         private async void btnSzukaj_Clicked(object sender, EventArgs e)
@@ -100,6 +92,17 @@ namespace MapyGPSNP
             await WyznaczIRysujTrase();
         }
 
+        private static int ZoomDladystansu(double dystansKm) => dystansKm switch
+        {
+            < 1    => 16,
+            < 5    => 14,
+            < 20   => 13,
+            < 50   => 12,
+            < 150  => 11,
+            < 400  => 10,
+            _      => 8
+        };
+
         private async Task WyznaczIRysujTrase()
         {
             var trasa = await TrasaManager.PobierzTrase(_startLat!.Value, _startLon!.Value, _metaLat!.Value, _metaLon!.Value);
@@ -108,15 +111,14 @@ namespace MapyGPSNP
             {
                 var punktyTrasy = trasa.Geometria.PunktyWspolrzednych.Select(p => new Punkt(p[0], p[1])).ToList();
 
-                RysujTrase(punktyTrasy);
-
-                var koniec = punktyTrasy.Last();
-                var celKonwersja = SphericalMercator.FromLonLat(koniec.Dlugosc, koniec.Szerokosc);
-                mojaMapa.Map?.Navigator.CenterOn(new MPoint(celKonwersja.x, celKonwersja.y));
-                mojaMapa.Map?.Navigator.ZoomTo(10);
+                var projekcje = RysujTrase(punktyTrasy);
 
                 double dystansKm = trasa.Dystans / 1000;
                 int czasMinuty = (int)Math.Round(trasa.CzasSekundy / 60);
+
+                var koniec = projekcje.Last();
+                mojaMapa.Map?.Navigator.CenterOn(koniec);
+                mojaMapa.Map?.Navigator.ZoomTo(ZoomDladystansu(dystansKm));
 
                 lblOpisTrasy.Text += $"\tDystans: {dystansKm:F2} km, Czas: {czasMinuty} min";
             }
