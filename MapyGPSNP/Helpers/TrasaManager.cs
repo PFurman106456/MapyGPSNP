@@ -19,7 +19,11 @@ namespace MapyGPSNP.Helpers
             string meta = $"{metaLon.ToString(CultureInfo.InvariantCulture)},{metaLat.ToString(CultureInfo.InvariantCulture)}";
 
 
+#if WINDOWS
             string url = $"http://router.project-osrm.org/route/v1/driving/{start};{meta}?overview=full&geometries=geojson";
+#else
+            string url = $"https://router.project-osrm.org/route/v1/driving/{start};{meta}?overview=full&geometries=geojson";
+#endif
 
             var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "ProjektStudencki");
