@@ -17,6 +17,11 @@
                 x:Name="btnLokalizacja"
                 Clicked="btnLokalizacja_Clicked"/>
 
+        <Button Text="⇅ Zamień start i cel"
+                x:Name="btnZamien"
+                Clicked="btnZamien_Clicked"
+                Margin="0,10,0,0"/>
+
         <BoxView HeightRequest="1" Color="Gray" Margin="0,10"/>
 
         <Label Text="Punkt docelowy" FontAttributes="Bold" FontSize="16"/>

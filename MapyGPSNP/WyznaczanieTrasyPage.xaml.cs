@@ -66,6 +66,12 @@ public partial class WyznaczanieTrasyPage : ContentPage
         }
     }
 
+    private void btnZamien_Clicked(object sender, EventArgs e)
+    {
+        (entryStartLat.Text, entryMetaLat.Text) = (entryMetaLat.Text, entryStartLat.Text);
+        (entryStartLon.Text, entryMetaLon.Text) = (entryMetaLon.Text, entryStartLon.Text);
+    }
+
     private async void btnRozpocznij_Clicked(object sender, EventArgs e)
     {
         var inv   = System.Globalization.CultureInfo.InvariantCulture;
