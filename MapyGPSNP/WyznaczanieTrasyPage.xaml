@@ -13,6 +13,10 @@
         <Label Text="Długość geograficzna (lon):"/>
         <Entry x:Name="entryStartLon" Keyboard="Numeric"/>
 
+        <Button Text="Użyj mojej lokalizacji"
+                x:Name="btnLokalizacja"
+                Clicked="btnLokalizacja_Clicked"/>
+
         <BoxView HeightRequest="1" Color="Gray" Margin="0,10"/>
 
         <Label Text="Punkt docelowy" FontAttributes="Bold" FontSize="16"/>

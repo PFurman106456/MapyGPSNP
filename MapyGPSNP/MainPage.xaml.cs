@@ -105,6 +105,24 @@ namespace MapyGPSNP
 
         private async Task WyznaczIRysujTrase()
         {
+            overlayLadowania.IsVisible = true;
+            spinner.IsRunning = true;
+            btnJedz.IsEnabled = false;
+
+            try
+            {
+                await WyznaczIRysujTraseWewnetrzna();
+            }
+            finally
+            {
+                overlayLadowania.IsVisible = false;
+                spinner.IsRunning = false;
+                btnJedz.IsEnabled = true;
+            }
+        }
+
+        private async Task WyznaczIRysujTraseWewnetrzna()
+        {
             var trasa = await TrasaManager.PobierzTrase(_startLat!.Value, _startLon!.Value, _metaLat!.Value, _metaLon!.Value);
 
             if (trasa != null)
@@ -124,5 +142,4 @@ namespace MapyGPSNP
             }
         }
     }
-
 }
