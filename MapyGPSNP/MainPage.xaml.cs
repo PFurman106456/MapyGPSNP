@@ -24,7 +24,9 @@ namespace MapyGPSNP
 
             mojaMapa.Map.Layers.Add(Mapsui.Tiling.OpenStreetMap.CreateTileLayer());
 
-            mojaMapa.Map?.Navigator.ZoomTo(2);
+            var start = SphericalMercator.FromLonLat(18.0192, 53.1230);
+            mojaMapa.Map?.Navigator.CenterOn(new MPoint(start.x, start.y));
+            mojaMapa.Map?.Navigator.ZoomTo(10);
 
 
         }
@@ -34,8 +36,17 @@ namespace MapyGPSNP
             
         }
 
+        private void WyczyscTrase()
+        {
+            var stara = mojaMapa.Map?.Layers.FirstOrDefault(l => l.Name == "warstwaTrasy");
+            if (stara != null)
+                mojaMapa.Map?.Layers.Remove(stara);
+        }
+
         private void RysujTrase(List<Punkt> punktyTrasy)
         {
+            WyczyscTrase();
+
             var listaKoordynatow = new List<Coordinate>();
 
             foreach (var punkt in punktyTrasy)
@@ -75,7 +86,7 @@ namespace MapyGPSNP
                 _startLon = sLon;
                 _metaLat = mLat;
                 _metaLon = mLon;
-                lblOpisTrasy.Text = "Koordynaty ustawione. Naciśnij JEDŹ.";
+                _ = WyznaczIRysujTrase();
             }));
         }
 
@@ -86,13 +97,12 @@ namespace MapyGPSNP
                 lblOpisTrasy.Text = "Najpierw wyszukaj trasę przyciskiem Szukaj.";
                 return;
             }
+            await WyznaczIRysujTrase();
+        }
 
-            var punktMeta = SphericalMercator.FromLonLat(_metaLon.Value, _metaLat.Value);
-            var cel = new MPoint(punktMeta.x, punktMeta.y);
-            mojaMapa.Map?.Navigator.CenterOn(cel);
-            mojaMapa.Map?.Navigator.ZoomTo(10);
-
-            var trasa = await TrasaManager.PobierzTrase(_startLat.Value, _startLon.Value, _metaLat.Value, _metaLon.Value);
+        private async Task WyznaczIRysujTrase()
+        {
+            var trasa = await TrasaManager.PobierzTrase(_startLat!.Value, _startLon!.Value, _metaLat!.Value, _metaLon!.Value);
 
             if (trasa != null)
             {
@@ -100,12 +110,16 @@ namespace MapyGPSNP
 
                 RysujTrase(punktyTrasy);
 
+                var koniec = punktyTrasy.Last();
+                var celKonwersja = SphericalMercator.FromLonLat(koniec.Dlugosc, koniec.Szerokosc);
+                mojaMapa.Map?.Navigator.CenterOn(new MPoint(celKonwersja.x, celKonwersja.y));
+                mojaMapa.Map?.Navigator.ZoomTo(10);
+
                 double dystansKm = trasa.Dystans / 1000;
                 int czasMinuty = (int)Math.Round(trasa.CzasSekundy / 60);
 
                 lblOpisTrasy.Text += $"\tDystans: {dystansKm:F2} km, Czas: {czasMinuty} min";
             }
-
         }
     }
 

@@ -8,34 +8,26 @@
         <Label Text="Punkt startowy" FontAttributes="Bold" FontSize="16"/>
 
         <Label Text="Szerokość geograficzna (lat):"/>
-        <Entry x:Name="entryStartLat"
-               Placeholder="np. 53.1235"
-               Keyboard="Numeric"/>
+        <Entry x:Name="entryStartLat" Keyboard="Numeric"/>
 
         <Label Text="Długość geograficzna (lon):"/>
-        <Entry x:Name="entryStartLon"
-               Placeholder="np. 18.0084"
-               Keyboard="Numeric"/>
+        <Entry x:Name="entryStartLon" Keyboard="Numeric"/>
 
         <BoxView HeightRequest="1" Color="Gray" Margin="0,10"/>
 
         <Label Text="Punkt docelowy" FontAttributes="Bold" FontSize="16"/>
 
         <Label Text="Szerokość geograficzna (lat):"/>
-        <Entry x:Name="entryMetaLat"
-               Placeholder="np. 54.6094"
-               Keyboard="Numeric"/>
+        <Entry x:Name="entryMetaLat" Keyboard="Numeric"/>
 
         <Label Text="Długość geograficzna (lon):"/>
-        <Entry x:Name="entryMetaLon"
-               Placeholder="np. 18.8012"
-               Keyboard="Numeric"/>
+        <Entry x:Name="entryMetaLon" Keyboard="Numeric"/>
 
         <Label x:Name="lblBlad" TextColor="Red" IsVisible="False"/>
 
-        <Button Text="Wyznacz trasę"
-                x:Name="btnWyznacz"
-                Clicked="btnWyznacz_Clicked"
+        <Button Text="Rozpocznij podróż"
+                x:Name="btnRozpocznij"
+                Clicked="btnRozpocznij_Clicked"
                 Margin="0,10"/>
 
     </VerticalStackLayout>
