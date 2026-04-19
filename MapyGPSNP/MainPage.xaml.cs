@@ -133,12 +133,13 @@ namespace MapyGPSNP
 
                 double dystansKm = trasa.Dystans / 1000;
                 int czasMinuty = (int)Math.Round(trasa.CzasSekundy / 60);
+                var godzinaPrzyjazdu = DateTime.Now.AddSeconds(trasa.CzasSekundy);
 
                 var koniec = projekcje.Last();
                 mojaMapa.Map?.Navigator.CenterOn(koniec);
                 mojaMapa.Map?.Navigator.ZoomTo(ZoomDladystansu(dystansKm));
 
-                lblOpisTrasy.Text += $"\tDystans: {dystansKm:F2} km, Czas: {czasMinuty} min";
+                lblOpisTrasy.Text += $"\tDystans: {dystansKm:F2} km, Czas: {czasMinuty} min, Przyjazd: {godzinaPrzyjazdu:HH:mm}";
             }
         }
     }
