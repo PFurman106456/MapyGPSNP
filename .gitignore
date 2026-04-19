@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+MapyGPSNP/core.20260419.102858.17004.0001.dmp
+MapyGPSNP/Snap.20260419.102858.17004.0003.trc
+*.txt

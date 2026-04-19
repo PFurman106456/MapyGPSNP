@@ -13,6 +13,10 @@ namespace MapyGPSNP
 {
     public partial class MainPage : ContentPage
     {
+        private double? _startLat;
+        private double? _startLon;
+        private double? _metaLat;
+        private double? _metaLon;
 
         public MainPage()
         {
@@ -20,10 +24,6 @@ namespace MapyGPSNP
 
             mojaMapa.Map.Layers.Add(Mapsui.Tiling.OpenStreetMap.CreateTileLayer());
 
-            var wspolrzedne = SphericalMercator.FromLonLat(18.0084, 53.1235); // r.Jagiellonów
-            var srodekBdg = new MPoint(wspolrzedne.x, wspolrzedne.y);
-
-            mojaMapa.Map?.Navigator.CenterOn(srodekBdg);
             mojaMapa.Map?.Navigator.ZoomTo(2);
 
 
@@ -69,26 +69,30 @@ namespace MapyGPSNP
 
         private async void btnSzukaj_Clicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new WyznaczanieTrasyPage());
+            await Navigation.PushAsync(new WyznaczanieTrasyPage((sLat, sLon, mLat, mLon) =>
+            {
+                _startLat = sLat;
+                _startLon = sLon;
+                _metaLat = mLat;
+                _metaLon = mLon;
+                lblOpisTrasy.Text = "Koordynaty ustawione. Naciśnij JEDŹ.";
+            }));
         }
 
         private async void btnJedz_Clicked_1(object sender, EventArgs e)
         {
-            //var punktyTrasy = TrasaManager.PobierzMocka();
-            double startLat = 53.1235;
-            double startLon = 18.0084;
+            if (_startLat == null || _startLon == null || _metaLat == null || _metaLon == null)
+            {
+                lblOpisTrasy.Text = "Najpierw wyszukaj trasę przyciskiem Szukaj.";
+                return;
+            }
 
-            double metaLat = 54.609445;
-            double metaLon = 18.801177;
-
-            // wyśrodkowanie i zbliżenie mapy na obszarze końca trasy
-            var punktMeta = SphericalMercator.FromLonLat(metaLon, metaLat);
+            var punktMeta = SphericalMercator.FromLonLat(_metaLon.Value, _metaLat.Value);
             var cel = new MPoint(punktMeta.x, punktMeta.y);
             mojaMapa.Map?.Navigator.CenterOn(cel);
             mojaMapa.Map?.Navigator.ZoomTo(10);
 
-
-            var trasa = await TrasaManager.PobierzTrase(startLat, startLon, metaLat, metaLon);
+            var trasa = await TrasaManager.PobierzTrase(_startLat.Value, _startLon.Value, _metaLat.Value, _metaLon.Value);
 
             if (trasa != null)
             {
