@@ -20,6 +20,58 @@ public partial class WyznaczanieTrasyPage : ContentPage
         entryMetaLon.Text  = _lastMetaLon;
     }
 
+    private async void btnLokalizacja_Clicked(object sender, EventArgs e)
+    {
+        btnLokalizacja.IsEnabled = false;
+        btnLokalizacja.Text = "Pobieranie...";
+        lblBlad.IsVisible = false;
+
+        try
+        {
+            var status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+            if (status != PermissionStatus.Granted)
+            {
+                lblBlad.Text = "Brak uprawnień do lokalizacji.";
+                lblBlad.IsVisible = true;
+                return;
+            }
+
+            var lokalizacja = await Geolocation.Default.GetLocationAsync(new GeolocationRequest
+            {
+                DesiredAccuracy = GeolocationAccuracy.Medium,
+                Timeout = TimeSpan.FromSeconds(10)
+            });
+
+            if (lokalizacja != null)
+            {
+                var inv = System.Globalization.CultureInfo.InvariantCulture;
+                entryStartLat.Text = lokalizacja.Latitude.ToString("F6", inv);
+                entryStartLon.Text = lokalizacja.Longitude.ToString("F6", inv);
+            }
+            else
+            {
+                lblBlad.Text = "Nie udało się pobrać lokalizacji.";
+                lblBlad.IsVisible = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            lblBlad.Text = $"Błąd lokalizacji: {ex.Message}";
+            lblBlad.IsVisible = true;
+        }
+        finally
+        {
+            btnLokalizacja.IsEnabled = true;
+            btnLokalizacja.Text = "Użyj mojej lokalizacji";
+        }
+    }
+
+    private void btnZamien_Clicked(object sender, EventArgs e)
+    {
+        (entryStartLat.Text, entryMetaLat.Text) = (entryMetaLat.Text, entryStartLat.Text);
+        (entryStartLon.Text, entryMetaLon.Text) = (entryMetaLon.Text, entryStartLon.Text);
+    }
+
     private async void btnRozpocznij_Clicked(object sender, EventArgs e)
     {
         var inv   = System.Globalization.CultureInfo.InvariantCulture;

@@ -12,6 +12,16 @@
 
         <mapsui:MapControl x:Name="mojaMapa" Grid.Row="0"/>
 
+        <Grid Grid.Row="0" x:Name="overlayLadowania" IsVisible="False">
+            <BoxView Color="Black" Opacity="0.45"/>
+            <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="12">
+                <ActivityIndicator x:Name="spinner" IsRunning="False" Color="White"
+                                   WidthRequest="48" HeightRequest="48"/>
+                <Label Text="Wyznaczanie trasy..." TextColor="White"
+                       HorizontalOptions="Center" FontSize="14"/>
+            </VerticalStackLayout>
+        </Grid>
+
         <StackLayout Orientation="Vertical" HorizontalOptions="End" VerticalOptions="Start">
             <Button Text="+" WidthRequest="50" HeightRequest="50" FontAttributes="Bold"/>
             <Button Text="-" WidthRequest="50" HeightRequest="50" FontAttributes="Bold"/>
